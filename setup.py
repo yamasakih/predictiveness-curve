@@ -1,13 +1,13 @@
 from setuptools import setup
 
-#from predictiveness_curve import __version__
+from predictiveness_curve import __version__
 
 
 long_description=''
 
 setup(
     name='predictiveness_curve',
-    version='0.1.0',#__version__,
+    version=__version__,
     url='https://github.com/yamasakih/predictiveness-curve',
     license='MIT',
     py_modules=['predictiveness_curve'],
