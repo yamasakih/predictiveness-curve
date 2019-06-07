@@ -6,7 +6,7 @@ from predictiveness_curve import __version__
 long_description=''
 
 setup(
-    name='predictiveness_curve',
+    name='predictiveness-curve',
     version=__version__,
     url='https://github.com/yamasakih/predictiveness-curve',
     license='MIT',
