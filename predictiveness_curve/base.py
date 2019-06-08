@@ -48,8 +48,9 @@ def plot_predictiveness_curve(risks, labels, points=100, figsize=(5, 10),
     risk_percentiles = []
     true_positive_fractions = []
     for p in points:
-        risk_percentiles.append((risks <= p).sum() / len(risks))
-        true_positive_fractions.append(labels[risks >= p].sum() / num_positive)
+        risk_percentiles.append(np.count_nonzero(risks <= p) / len(risks))
+        true_positive_fractions.append(np.count_nonzero(labels[risks >= p])
+                                       / num_positive)
 
     fontsize=14
     plt.figure(figsize=figsize)
