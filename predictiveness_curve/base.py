@@ -12,7 +12,7 @@ def _normalize(arr):
 
 
 def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
-        figsize=(5, 10), fontsize=14, **kwargs):
+        figsize=(4.5, 10), fontsize=14, **kwargs):
     """
     Plot predictiveness curve.
 
@@ -32,8 +32,8 @@ def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
         Determine the fineness of the plotted points. The larger the number,
         the finer the detail.
 
-    figsize : tuple, default (5, 10).
-        Width, height in inches. If not provided, defaults to = (5, 10).
+    figsize : tuple, default (4.5, 10).
+        Width, height in inches. If not provided, defaults to = (4.5, 10).
 
     fontsize : int, default 14.
         Font size for labels in plots.
@@ -59,11 +59,23 @@ def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
     risk_percentiles = calculate_risk_percentiles(points)
     true_positive_fractions = calculate_true_positive_fractions(points)
 
+    margin = 0.03
+    lim = (0-margin, 1+margin)
     plt.figure(figsize=figsize)
+
     plt.subplot(2, 1, 1)
-    plt.plot(risk_percentiles, points)
+    plt.plot(np.append(0, risk_percentiles),
+             np.append(0, points))
     plt.ylabel('Risk', fontsize=fontsize)
+    plt.xlim(lim)
+    plt.ylim(lim)
+    plt.grid(True)
+
     plt.subplot(2, 1, 2)
-    plt.plot(risk_percentiles, true_positive_fractions)
+    plt.plot(np.append(0, risk_percentiles),
+             np.append(1, true_positive_fractions))
     plt.xlabel('Risk percentiles', fontsize=fontsize)
     plt.ylabel('TPR', fontsize=fontsize)
+    plt.xlim(lim)
+    plt.ylim(lim)
+    plt.grid(True)
