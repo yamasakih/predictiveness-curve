@@ -52,9 +52,9 @@ def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
     true_positive_fractions = []
 
     calculate_risk_percentiles = np.frompyfunc(
-        lambda p: np.count_nonzero(risks<=p), 1, 1)
+        lambda p: np.count_nonzero(risks<=p)/len(risks), 1, 1)
     calculate_true_positive_fractions = np.frompyfunc(
-        lambda p: np.count_nonzero(labels[risks>=p]/num_positive), 1, 1)
+        lambda p: np.count_nonzero(labels[risks>=p])/num_positive, 1, 1)
 
     risk_percentiles = calculate_risk_percentiles(points)
     true_positive_fractions = calculate_true_positive_fractions(points)
