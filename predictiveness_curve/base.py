@@ -11,8 +11,8 @@ def _normalize(arr):
     return (arr-arr.min()) / (arr.max()-arr.min())
 
 
-def plot_predictiveness_curve(risks, labels, points=100, figsize=(5, 10),
-                              normalize=False, **kwargs):
+def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
+        figsize=(5, 10), fontsize=14, **kwargs):
     """
     Plot predictiveness curve.
 
@@ -34,6 +34,9 @@ def plot_predictiveness_curve(risks, labels, points=100, figsize=(5, 10),
 
     figsize : tuple, default (5, 10).
         Width, height in inches. If not provided, defaults to = (5, 10).
+
+    fontsize : int, default 14.
+        Font size for labels in plots.
     """
     risks = np.array(risks)
     labels = np.array(labels)
@@ -56,7 +59,6 @@ def plot_predictiveness_curve(risks, labels, points=100, figsize=(5, 10),
     risk_percentiles = calculate_risk_percentiles(points)
     true_positive_fractions = calculate_true_positive_fractions(points)
 
-    fontsize=14
     plt.figure(figsize=figsize)
     plt.subplot(2, 1, 1)
     plt.plot(risk_percentiles, points)
