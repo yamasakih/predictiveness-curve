@@ -21,22 +21,26 @@ def plot_predictiveness_curve(risks, labels, points=100, figsize=(5, 10),
     risks : array_like, shape = [n_samples]
         Risks or probabilities for something happens
 
+    labels : array_like, shape = [n_samples]
+        Labels of 0 or 1 for sample data. 0 means negative and 1 means
+        positive.
+
     normalize : boolean, default False
         If the risk data is not normalized to the 0-1 range, normalize it.
 
     points : int, default 100.
         Determine the fineness of the plotted points. The larger the number,
         the finer the detail.
-        
-    figsize : tuple, default (5, 10)
-        Width, height in inches. If not provided, defaults to = [5, 10].
-    """
-    if normalize:
-        risks = _normalize(risks)
 
+    figsize : tuple, default (5, 10).
+        Width, height in inches. If not provided, defaults to = (5, 10).
+    """
     risks = np.array(risks)
     labels = np.array(labels)
     points = np.linspace(0, 1, points)
+
+    if normalize:
+        risks = _normalize(risks)
 
     labels = labels[np.argsort(risks)]
     risks = np.sort(risks)
