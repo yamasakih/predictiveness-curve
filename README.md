@@ -34,4 +34,4 @@ probabilities = clsf.predict_proba(test_X)[:, 1]
 plot_predictiveness_curve(probabilities, test_y)
 ```
 
-See [notebooks directory](https://github.com/yamasakih/predictiveness-curve/tree/feature/Create-function-for-plot/notebooks) for details.
+See [notebooks directory](https://github.com/yamasakih/predictiveness-curve/tree/master/notebooks) for details.
