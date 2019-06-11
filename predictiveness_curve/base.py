@@ -11,8 +11,8 @@ def _normalize(arr):
     return (arr-arr.min()) / (arr.max()-arr.min())
 
 
-def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
-        figsize=(4.5, 10), fontsize=14, **kwargs):
+def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
+    points=100, figsize=(4.5, 10), fontsize=14, **kwargs):
     """
     Plot predictiveness curve.
 
@@ -22,8 +22,14 @@ def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
         Risks or probabilities for something happens
 
     labels : array_like, shape = [n_samples]
-        Labels of 0 or 1 for sample data. 0 means negative and 1 means
+        Labels for sample data. The argument classes can set negative and
+        postive values respectively. In default, 0 means negative and 1 means
         positive.
+
+    classes : list_like, default [0, 1]
+        Represents the names of the negative class and the positive class.
+        Give in the order of [negative, positive]. In default, 0 means negative
+        and 1 means positive.
 
     normalize : boolean, default False
         If the risk data is not normalized to the 0-1 range, normalize it.
