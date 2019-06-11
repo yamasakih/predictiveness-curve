@@ -37,6 +37,12 @@ def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
 
     fontsize : int, default 14.
         Font size for labels in plots.
+
+    **kwargs : matplotlib.pyplot.Line2D properties, optional
+        This function internally calls matplotlib.pyplot.plot. The argument
+        kwargs is passed to this function.
+        See https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.plot
+        for details.
     """
     risks = np.array(risks)
     labels = np.array(labels)
@@ -65,7 +71,7 @@ def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
 
     plt.subplot(2, 1, 1)
     plt.plot(np.append(0, risk_percentiles),
-             np.append(0, points))
+             np.append(0, points), **kwargs)
     plt.ylabel('Risk', fontsize=fontsize)
     plt.xlim(lim)
     plt.ylim(lim)
@@ -73,7 +79,7 @@ def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
 
     plt.subplot(2, 1, 2)
     plt.plot(np.append(0, risk_percentiles),
-             np.append(1, true_positive_fractions))
+             np.append(1, true_positive_fractions), **kwargs)
     plt.xlabel('Risk percentiles', fontsize=fontsize)
     plt.ylabel('TPR', fontsize=fontsize)
     plt.xlim(lim)
