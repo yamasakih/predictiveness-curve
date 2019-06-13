@@ -26,7 +26,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
         postive values respectively. In default, 0 means negative and 1 means
         positive.
 
-    classes : list_like, default [0, 1]
+    classes : array_like, default [0, 1]
         Represents the names of the negative class and the positive class.
         Give in the order of [negative, positive]. In default, 0 means negative
         and 1 means positive.
@@ -54,14 +54,19 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     labels = np.array(labels)
     points = np.linspace(0, 1, points)
 
+    if not np.all(np.unique(labels)==np.unique(classes)):
+        raise ValueError('The values of labels and classes do not match.')
+
+    default_classes = [0, 1]
+    if not np.array_equal(classes, default_classes):
+        labels = (labels == classes[1]).astype('int16')
+
     if normalize:
         risks = _normalize(risks)
 
     labels = labels[np.argsort(risks)]
     risks = np.sort(risks)
     num_positive = labels.sum()
-    risk_percentiles = []
-    true_positive_fractions = []
 
     calculate_risk_percentiles = np.frompyfunc(
         lambda p: np.count_nonzero(risks<=p)/len(risks), 1, 1)
@@ -72,7 +77,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     true_positive_fractions = calculate_true_positive_fractions(points)
 
     margin = 0.03
-    lim = (0-margin, 1+margin)
+    lim = (0 - margin, 1 + margin)
     plt.figure(figsize=figsize)
 
     plt.subplot(2, 1, 1)
