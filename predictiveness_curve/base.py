@@ -11,8 +11,8 @@ def _normalize(arr):
     return (arr-arr.min()) / (arr.max()-arr.min())
 
 
-def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
-        figsize=(4.5, 10), fontsize=14, **kwargs):
+def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
+    points=100, figsize=(4.5, 10), fontsize=14, **kwargs):
     """
     Plot predictiveness curve.
 
@@ -22,8 +22,14 @@ def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
         Risks or probabilities for something happens
 
     labels : array_like, shape = [n_samples]
-        Labels of 0 or 1 for sample data. 0 means negative and 1 means
+        Labels for sample data. The argument classes can set negative and
+        postive values respectively. In default, 0 means negative and 1 means
         positive.
+
+    classes : array_like, default [0, 1]
+        Represents the names of the negative class and the positive class.
+        Give in the order of [negative, positive]. In default, 0 means negative
+        and 1 means positive.
 
     normalize : boolean, default False
         If the risk data is not normalized to the 0-1 range, normalize it.
@@ -48,14 +54,19 @@ def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
     labels = np.array(labels)
     points = np.linspace(0, 1, points)
 
+    if not np.all(np.unique(labels)==np.unique(classes)):
+        raise ValueError('The values of labels and classes do not match.')
+
+    default_classes = [0, 1]
+    if not np.array_equal(classes, default_classes):
+        labels = (labels == classes[1]).astype('int16')
+
     if normalize:
         risks = _normalize(risks)
 
     labels = labels[np.argsort(risks)]
     risks = np.sort(risks)
     num_positive = labels.sum()
-    risk_percentiles = []
-    true_positive_fractions = []
 
     calculate_risk_percentiles = np.frompyfunc(
         lambda p: np.count_nonzero(risks<=p)/len(risks), 1, 1)
@@ -66,7 +77,7 @@ def plot_predictiveness_curve(risks, labels, normalize=False, points=100,
     true_positive_fractions = calculate_true_positive_fractions(points)
 
     margin = 0.03
-    lim = (0-margin, 1+margin)
+    lim = (0 - margin, 1 + margin)
     plt.figure(figsize=figsize)
 
     plt.subplot(2, 1, 1)
