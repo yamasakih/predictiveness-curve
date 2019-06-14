@@ -96,3 +96,49 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     plt.xlim(lim)
     plt.ylim(lim)
     plt.grid(True)
+
+
+def calculate_enrichment_factor(scores, labels, classes=[0, 1], threshold=0.01):
+    """
+    Calculate enrichment factor.
+
+    Parameters
+    ----------
+    scores : array_like, shape = [n_samples]
+        Scores, risks or probabilities for something happens
+
+    labels : array_like, shape = [n_samples]
+        Labels for sample data. The argument classes can set negative and
+        postive values respectively. In default, 0 means negative and 1 means
+        positive.
+
+    classes : array_like, default [0, 1]
+        Represents the names of the negative class and the positive class.
+        Give in the order of [negative, positive]. In default, 0 means negative
+        and 1 means positive.
+
+    threshold : int, float, array_like of int or float, default is 0.01
+        If the value of threshold is 1 or more, it means percent, and if it is
+        less than 1, it simply assumes that it represents a ratio. In addition,
+        it returns one value for int or float, and broadcast for array_like.
+    """
+    def f(threshold):
+        n = int(np.floor(scores.size * threshold))
+        return (np.count_nonzero(labels[-n:]) / n) / positive_ratio
+
+    scores = np.array(scores)
+    labels = np.array(labels)
+
+    if not np.all(np.unique(labels)==np.unique(classes)):
+        raise ValueError('The values of labels and classes do not match.')
+
+    default_classes = [0, 1]
+    if not np.array_equal(classes, default_classes):
+        labels = (labels == classes[1]).astype('int16')
+
+    labels = labels[np.argsort(scores)]
+    scores = np.sort(scores)
+    positive_ratio = np.count_nonzero(labels) / scores.size
+
+    _calculate_enrichment_factor = np.frompy(f, 1, 1)
+    return _calculate_enrichment_factor(threshold)
