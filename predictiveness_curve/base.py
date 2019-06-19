@@ -3,6 +3,7 @@ import numpy as np
 
 
 __all__ = [
+    'calculate_enrichment_factor',
     'plot_predictiveness_curve',
 ]
 
@@ -55,7 +56,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     points = np.linspace(0, 1, points)
 
     if not np.all(np.unique(labels)==np.unique(classes)):
-        raise ValueError('The values of labels and classes do not match.')
+        raise ValueError('The values of labels and classes do not match')
 
     default_classes = [0, 1]
     if not np.array_equal(classes, default_classes):
@@ -121,6 +122,12 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1], threshold=0.01):
         If the value of threshold is 1 or more, it means percent, and if it is
         less than 1, it simply assumes that it represents a ratio. In addition,
         it returns one value for int or float, and broadcast for array_like.
+
+    Returns
+    -------
+    enrichment factors : float or ndarray
+        Return enrichment factors. If threshold is int or float, return one
+        value. If threshold is array_like, return ndarray. 
     """
     def f(threshold):
         n = int(np.floor(scores.size * threshold))
@@ -128,9 +135,21 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1], threshold=0.01):
 
     scores = np.array(scores)
     labels = np.array(labels)
+    threshold = np.array(threshold)
+
+    if np.any(threshold <= 0) | np.any(threshold > 100):
+        raise ValueError('Invalid value for threshold. Threshold should be '
+                         'either positive and smaller a int or ints than 100 '
+                         'or a float in the (0, 1) range')
+    elif threshold.dtype.kind == 'f' and np.any(threshold > 1):
+        raise ValueError('Invalid value for threshold. Threshold should be '
+                         'either positive and a float or floats in the (0, 1) '
+                         'range')
+    elif threshold.dtype.kind == 'i':
+        threshold = threshold.astype('float32') / 10
 
     if not np.all(np.unique(labels)==np.unique(classes)):
-        raise ValueError('The values of labels and classes do not match.')
+        raise ValueError('The values of labels and classes do not match')
 
     default_classes = [0, 1]
     if not np.array_equal(classes, default_classes):
@@ -140,5 +159,5 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1], threshold=0.01):
     scores = np.sort(scores)
     positive_ratio = np.count_nonzero(labels) / scores.size
 
-    _calculate_enrichment_factor = np.frompy(f, 1, 1)
+    _calculate_enrichment_factor = np.frompyfunc(f, 1, 1)
     return _calculate_enrichment_factor(threshold)
