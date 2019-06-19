@@ -15,12 +15,10 @@ Install with :
 ## Example
 
 ```
+from predictiveness_curve import plot_predictiveness_curve
 from sklearn.datasets import load_breast_cancer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-
-from predictiveness_curve import plot_predictiveness_curve
-
 
 data = load_breast_cancer()
 y = data.target

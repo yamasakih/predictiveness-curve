@@ -20,8 +20,9 @@ def _set_axes(ax, lim, fontsize):
 
 
 def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
-    points=100, figsize=(4.5, 10), fontsize=14, kind='TPR', xlabel=None,
-    top_ylabel=None, bottom_ylabel=None, **kwargs):
+                              points=100, figsize=(4.5, 10), fontsize=14,
+                              kind='TPR', xlabel=None, top_ylabel=None,
+                              bottom_ylabel=None, **kwargs):
     """
     Plot predictiveness curve.
 
@@ -55,7 +56,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
 
     kind : str, default TPR
         * TPR : plot risk percentile vs TPR at bottom.
-        * EF  : plot risk percentile vs EF at bottom. The risk percentile of 
+        * EF  : plot risk percentile vs EF at bottom. The risk percentile of
                 the upper plot is also in descending order.
 
     xlabel : str, default Risk percentiles
@@ -76,7 +77,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     Returns
     -------
     figure : matplotlib.figure.Figure
-        A figure instance is returned. You can also assign this figure instant 
+        A figure instance is returned. You can also assign this figure instant
         attribute and customize it yourself.
     """
     risks = np.array(risks)
@@ -84,7 +85,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     thresholds = np.linspace(0, 1, points + 1)[1:]
     points = np.linspace(0, 1, points + 1)
 
-    if not np.all(np.unique(labels)==np.unique(classes)):
+    if not np.all(np.unique(labels) == np.unique(classes)):
         raise ValueError('The values of labels and classes do not match')
 
     default_classes = [0, 1]
@@ -107,7 +108,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
 
     if kind.upper() == 'TPR':
         calculate_risk_percentiles = np.frompyfunc(
-            lambda p: np.count_nonzero(risks<=p)/len(risks), 1, 1)
+            lambda p: np.count_nonzero(risks <= p)/len(risks), 1, 1)
         risk_percentiles = calculate_risk_percentiles(points)
         risk_percentiles = np.append(0, risk_percentiles)
         points = np.append(0, points)
@@ -115,7 +116,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
         labels = labels[::-1]
         risks = risks[::-1]
         calculate_risk_percentiles = np.frompyfunc(
-            lambda p: np.count_nonzero(risks>=p)/len(risks), 1, 1)
+            lambda p: np.count_nonzero(risks >= p)/len(risks), 1, 1)
         risk_percentiles = calculate_risk_percentiles(points)
         risk_percentiles = np.append(risk_percentiles, 0)
         points = np.append(points, 1)
@@ -136,7 +137,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
 
     if kind.upper() == 'TPR':
         calculate_true_positive_fractions = np.frompyfunc(
-            lambda p: np.count_nonzero(labels[risks>=p])/num_positive, 1, 1)
+            lambda p: np.count_nonzero(labels[risks >= p])/num_positive, 1, 1)
         true_positive_fractions = calculate_true_positive_fractions(points)
         _set_axes(ax, lim, fontsize)
         ax.set_ylim(bottom=lim[0], top=lim[1])
@@ -180,7 +181,7 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
     -------
     enrichment factors : float or ndarray
         Return enrichment factors. If threshold is int or float, return one
-        value. If threshold is array_like, return ndarray. 
+        value. If threshold is array_like, return ndarray.
     """
     def f(threshold):
         n = int(np.floor(scores.size * threshold))
@@ -201,7 +202,7 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
     elif threshold.dtype.kind == 'i':
         threshold = threshold.astype('float32') / 10
 
-    if not np.all(np.unique(labels)==np.unique(classes)):
+    if not np.all(np.unique(labels) == np.unique(classes)):
         raise ValueError('The values of labels and classes do not match')
 
     default_classes = [0, 1]
@@ -234,4 +235,4 @@ def convert_label_to_zero_or_one(labels, classes):
     converted label : ndarray, shape = [n_samples]
         Return ndarray which converted labels to 0 and 1.
     """
-    return (labels == classes[1]).astype('int16') 
+    return (labels == classes[1]).astype('int16')
