@@ -1,18 +1,18 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 __all__ = [
     'plot_predictiveness_curve',
 ]
 
 
 def _normalize(arr):
-    return (arr-arr.min()) / (arr.max()-arr.min())
+    return (arr - arr.min()) / (arr.max() - arr.min())
 
 
 def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
-    points=100, figsize=(4.5, 10), fontsize=14, **kwargs):
+                              points=100, figsize=(4.5, 10), fontsize=14,
+                              **kwargs):
     """
     Plot predictiveness curve.
 
@@ -54,7 +54,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     labels = np.array(labels)
     points = np.linspace(0, 1, points)
 
-    if not np.all(np.unique(labels)==np.unique(classes)):
+    if not np.all(np.unique(labels) == np.unique(classes)):
         raise ValueError('The values of labels and classes do not match.')
 
     default_classes = [0, 1]
@@ -69,9 +69,9 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     num_positive = labels.sum()
 
     calculate_risk_percentiles = np.frompyfunc(
-        lambda p: np.count_nonzero(risks<=p)/len(risks), 1, 1)
+        lambda p: np.count_nonzero(risks <= p) / len(risks), 1, 1)
     calculate_true_positive_fractions = np.frompyfunc(
-        lambda p: np.count_nonzero(labels[risks>=p])/num_positive, 1, 1)
+        lambda p: np.count_nonzero(labels[risks >= p]) / num_positive, 1, 1)
 
     risk_percentiles = calculate_risk_percentiles(points)
     true_positive_fractions = calculate_true_positive_fractions(points)
@@ -81,8 +81,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     plt.figure(figsize=figsize)
 
     plt.subplot(2, 1, 1)
-    plt.plot(np.append(0, risk_percentiles),
-             np.append(0, points), **kwargs)
+    plt.plot(np.append(0, risk_percentiles), np.append(0, points), **kwargs)
     plt.ylabel('Risk', fontsize=fontsize)
     plt.xlim(lim)
     plt.ylim(lim)
