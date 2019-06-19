@@ -4,6 +4,7 @@ import numpy as np
 
 __all__ = [
     'calculate_enrichment_factor',
+    'convert_label_to_zero_or_one',
     'plot_predictiveness_curve',
 ]
 
@@ -60,7 +61,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
 
     default_classes = [0, 1]
     if not np.array_equal(classes, default_classes):
-        labels = (labels == classes[1]).astype('int16')
+        labels = convert_label_to_zero_or_one(labels, classes)
 
     if normalize:
         risks = _normalize(risks)
@@ -153,7 +154,7 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1], threshold=0.01):
 
     default_classes = [0, 1]
     if not np.array_equal(classes, default_classes):
-        labels = (labels == classes[1]).astype('int16')
+        labels = convert_label_to_zero_or_one(labels, classes)
 
     labels = labels[np.argsort(scores)]
     scores = np.sort(scores)
@@ -161,3 +162,24 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1], threshold=0.01):
 
     _calculate_enrichment_factor = np.frompyfunc(f, 1, 1)
     return _calculate_enrichment_factor(threshold)
+
+
+def convert_label_to_zero_or_one(labels, classes):
+    """
+    Convert label data of specified class into 0 or 1 data.
+
+    Parameters
+    ----------
+    labels : array_like, shape = [n_samples]
+        Labels for sample data.
+
+    classes : array_like
+        Represents the names of the negative class and the positive class.
+        Give in the order of [negative, positive].
+
+    Returns
+    -------
+    converted label : ndarray, shape = [n_samples]
+        Return ndarray which converted labels to 0 and 1.
+    """
+    return (labels == classes[1]).astype('int16') 
