@@ -13,6 +13,16 @@ def _normalize(arr):
     return (arr-arr.min()) / (arr.max()-arr.min())
 
 
+def _set_axes(ax, lim, fontsize):
+    ax.set_xlim(left=lim[0], right=lim[1])
+    ax.set_ylim(bottom=lim[0], top=lim[1])
+    ax.grid(True)
+    axis = ax.xaxis
+    axis.label.set_fontsize(fontsize)
+    axis = ax.yaxis
+    axis.label.set_fontsize(fontsize)
+
+
 def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     points=100, figsize=(4.5, 10), fontsize=14, **kwargs):
     """
@@ -51,6 +61,12 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
         kwargs is passed to this function.
         See https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.plot
         for details.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        A figure instance is returned. You can also assign this figure instant 
+        attribute and customize it yourself.
     """
     risks = np.array(risks)
     labels = np.array(labels)
@@ -80,24 +96,20 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
 
     margin = 0.03
     lim = (0 - margin, 1 + margin)
-    plt.figure(figsize=figsize)
+    fig = plt.figure(figsize=figsize)
 
-    plt.subplot(2, 1, 1)
-    plt.plot(np.append(0, risk_percentiles),
-             np.append(0, points), **kwargs)
-    plt.ylabel('Risk', fontsize=fontsize)
-    plt.xlim(lim)
-    plt.ylim(lim)
-    plt.grid(True)
+    ax = fig.add_subplot(2, 1, 1)
+    _set_axes(ax, lim, fontsize)
+    ax.plot(np.append(0, risk_percentiles), np.append(0, points), **kwargs)
+    ax.yaxis.set_label_text('Risk percentiles')
 
-    plt.subplot(2, 1, 2)
-    plt.plot(np.append(0, risk_percentiles),
-             np.append(1, true_positive_fractions), **kwargs)
-    plt.xlabel('Risk percentiles', fontsize=fontsize)
-    plt.ylabel('TPR', fontsize=fontsize)
-    plt.xlim(lim)
-    plt.ylim(lim)
-    plt.grid(True)
+    ax = fig.add_subplot(2, 1, 2)
+    _set_axes(ax, lim, fontsize)
+    ax.plot(np.append(0, risk_percentiles),
+            np.append(1, true_positive_fractions), **kwargs)
+    ax.xaxis.set_label_text('Risk percentiles')
+    ax.yaxis.set_label_text('TPR')
+    return fig
 
 
 def calculate_enrichment_factor(scores, labels, classes=[0, 1], threshold=0.01):
