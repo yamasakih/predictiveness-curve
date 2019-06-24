@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 __all__ = [
+    'calculate_enrichment_factor',
+    'convert_label_to_zero_or_one',
     'plot_predictiveness_curve',
 ]
 
@@ -11,8 +12,15 @@ def _normalize(arr):
     return (arr-arr.min()) / (arr.max()-arr.min())
 
 
+def _set_axes(ax, lim, fontsize):
+    ax.set_xlim(left=lim[0], right=lim[1])
+    ax.grid(True)
+    ax.xaxis.label.set_fontsize(fontsize)
+    ax.yaxis.label.set_fontsize(fontsize)
+
+
 def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
-    points=100, figsize=(4.5, 10), fontsize=14, **kwargs):
+    points=100, figsize=(4.5, 10), fontsize=14, kind='TPR', **kwargs):
     """
     Plot predictiveness curve.
 
@@ -34,32 +42,44 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     normalize : boolean, default False
         If the risk data is not normalized to the 0-1 range, normalize it.
 
-    points : int, default 100.
+    points : int, default 100
         Determine the fineness of the plotted points. The larger the number,
         the finer the detail.
 
-    figsize : tuple, default (4.5, 10).
+    figsize : tuple, default (4.5, 10)
         Width, height in inches. If not provided, defaults to = (4.5, 10).
 
-    fontsize : int, default 14.
+    fontsize : int, default 14
         Font size for labels in plots.
+
+    kind : str, default TPR
+        * TPR : plot risk percentile vs TPR at bottom.
+        * EF  : plot risk percentile vs EF at bottom. The risk percentile of 
+                the upper plot is also in descending order.
 
     **kwargs : matplotlib.pyplot.Line2D properties, optional
         This function internally calls matplotlib.pyplot.plot. The argument
         kwargs is passed to this function.
         See https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.plot
         for details.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        A figure instance is returned. You can also assign this figure instant 
+        attribute and customize it yourself.
     """
     risks = np.array(risks)
     labels = np.array(labels)
-    points = np.linspace(0, 1, points)
+    thresholds = np.linspace(0, 1, points + 1)[1:]
+    points = np.linspace(0, 1, points + 1)
 
     if not np.all(np.unique(labels)==np.unique(classes)):
-        raise ValueError('The values of labels and classes do not match.')
+        raise ValueError('The values of labels and classes do not match')
 
     default_classes = [0, 1]
     if not np.array_equal(classes, default_classes):
-        labels = (labels == classes[1]).astype('int16')
+        labels = convert_label_to_zero_or_one(labels, classes)
 
     if normalize:
         risks = _normalize(risks)
@@ -74,25 +94,121 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
         lambda p: np.count_nonzero(labels[risks>=p])/num_positive, 1, 1)
 
     risk_percentiles = calculate_risk_percentiles(points)
-    true_positive_fractions = calculate_true_positive_fractions(points)
+    risk_percentiles = np.append(0, risk_percentiles)
+    points = np.append(0, points)
+    if kind.upper() == 'EF':
+        risk_percentiles = risk_percentiles[::-1]
 
     margin = 0.03
     lim = (0 - margin, 1 + margin)
-    plt.figure(figsize=figsize)
+    fig = plt.figure(figsize=figsize)
 
-    plt.subplot(2, 1, 1)
-    plt.plot(np.append(0, risk_percentiles),
-             np.append(0, points), **kwargs)
-    plt.ylabel('Risk', fontsize=fontsize)
-    plt.xlim(lim)
-    plt.ylim(lim)
-    plt.grid(True)
+    ax = fig.add_subplot(2, 1, 1)
+    _set_axes(ax, lim, fontsize)
+    ax.set_ylim(bottom=lim[0], top=lim[1])
+    ax.plot(risk_percentiles, points, **kwargs)
+    ax.yaxis.set_label_text('Risk')
 
-    plt.subplot(2, 1, 2)
-    plt.plot(np.append(0, risk_percentiles),
-             np.append(1, true_positive_fractions), **kwargs)
-    plt.xlabel('Risk percentiles', fontsize=fontsize)
-    plt.ylabel('TPR', fontsize=fontsize)
-    plt.xlim(lim)
-    plt.ylim(lim)
-    plt.grid(True)
+    ax = fig.add_subplot(2, 1, 2)
+
+    if kind.upper() == 'TPR':
+        _set_axes(ax, lim, fontsize)
+        ax.set_ylim(bottom=lim[0], top=lim[1])
+        true_positive_fractions = calculate_true_positive_fractions(points)
+        ax.plot(risk_percentiles, true_positive_fractions, **kwargs)
+    elif kind.upper() == 'EF':
+        _set_axes(ax, lim, fontsize)
+        enrichment_factors = calculate_enrichment_factor(risks, labels, threshold=thresholds)
+        ax.plot(thresholds, enrichment_factors, **kwargs)
+    else:
+       raise ValueError(f'kind must be either TPR or EF, not {kind}')
+    xaxis_label = 'Risk percentiles'
+    yaxis_label = kind
+    ax.xaxis.set_label_text(xaxis_label)
+    ax.yaxis.set_label_text(yaxis_label)
+    return fig
+
+
+def calculate_enrichment_factor(scores, labels, classes=[0, 1], threshold=0.01):
+    """
+    Calculate enrichment factor.
+
+    Parameters
+    ----------
+    scores : array_like, shape = [n_samples]
+        Scores, risks or probabilities for something happens
+
+    labels : array_like, shape = [n_samples]
+        Labels for sample data. The argument classes can set negative and
+        postive values respectively. In default, 0 means negative and 1 means
+        positive.
+
+    classes : array_like, default [0, 1]
+        Represents the names of the negative class and the positive class.
+        Give in the order of [negative, positive]. In default, 0 means negative
+        and 1 means positive.
+
+    threshold : int, float, array_like of int or float, default is 0.01
+        If the value of threshold is 1 or more, it means percent, and if it is
+        less than 1, it simply assumes that it represents a ratio. In addition,
+        it returns one value for int or float, and broadcast for array_like.
+
+    Returns
+    -------
+    enrichment factors : float or ndarray
+        Return enrichment factors. If threshold is int or float, return one
+        value. If threshold is array_like, return ndarray. 
+    """
+    def f(threshold):
+        n = int(np.floor(scores.size * threshold))
+        return (np.count_nonzero(labels[-n:]) / n) / positive_ratio
+
+    scores = np.array(scores)
+    labels = np.array(labels)
+    threshold = np.array(threshold)
+
+    if np.any(threshold <= 0) | np.any(threshold > 100):
+        raise ValueError('Invalid value for threshold. Threshold should be '
+                         'either positive and smaller a int or ints than 100 '
+                         'or a float in the (0, 1) range')
+    elif threshold.dtype.kind == 'f' and np.any(threshold > 1):
+        raise ValueError('Invalid value for threshold. Threshold should be '
+                         'either positive and a float or floats in the (0, 1) '
+                         'range')
+    elif threshold.dtype.kind == 'i':
+        threshold = threshold.astype('float32') / 10
+
+    if not np.all(np.unique(labels)==np.unique(classes)):
+        raise ValueError('The values of labels and classes do not match')
+
+    default_classes = [0, 1]
+    if not np.array_equal(classes, default_classes):
+        labels = convert_label_to_zero_or_one(labels, classes)
+
+    labels = labels[np.argsort(scores)]
+    scores = np.sort(scores)
+    positive_ratio = np.count_nonzero(labels) / scores.size
+
+    _calculate_enrichment_factor = np.frompyfunc(f, 1, 1)
+    return _calculate_enrichment_factor(threshold)
+
+
+def convert_label_to_zero_or_one(labels, classes):
+    """
+    Convert label data of specified class into 0 or 1 data.
+
+    Parameters
+    ----------
+    labels : array_like, shape = [n_samples]
+        Labels for sample data.
+
+    classes : array_like
+        Represents the names of the negative class and the positive class.
+        Give in the order of [negative, positive].
+
+    Returns
+    -------
+    converted label : ndarray, shape = [n_samples]
+        Return ndarray which converted labels to 0 and 1.
+    """
+    return (labels == classes[1]).astype('int16') 
