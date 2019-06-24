@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 __all__ = [
     'calculate_enrichment_factor',
     'convert_label_to_zero_or_one',
@@ -15,16 +14,13 @@ def _normalize(arr):
 
 def _set_axes(ax, lim, fontsize):
     ax.set_xlim(left=lim[0], right=lim[1])
-    ax.set_ylim(bottom=lim[0], top=lim[1])
     ax.grid(True)
-    axis = ax.xaxis
-    axis.label.set_fontsize(fontsize)
-    axis = ax.yaxis
-    axis.label.set_fontsize(fontsize)
+    ax.xaxis.label.set_fontsize(fontsize)
+    ax.yaxis.label.set_fontsize(fontsize)
 
 
 def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
-    points=100, figsize=(4.5, 10), fontsize=14, **kwargs):
+    points=100, figsize=(4.5, 10), fontsize=14, kind='TPR', **kwargs):
     """
     Plot predictiveness curve.
 
@@ -46,15 +42,20 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     normalize : boolean, default False
         If the risk data is not normalized to the 0-1 range, normalize it.
 
-    points : int, default 100.
+    points : int, default 100
         Determine the fineness of the plotted points. The larger the number,
         the finer the detail.
 
-    figsize : tuple, default (4.5, 10).
+    figsize : tuple, default (4.5, 10)
         Width, height in inches. If not provided, defaults to = (4.5, 10).
 
-    fontsize : int, default 14.
+    fontsize : int, default 14
         Font size for labels in plots.
+
+    kind : str, default TPR
+        * TPR : plot risk percentile vs TPR at bottom.
+        * EF  : plot risk percentile vs EF at bottom. The risk percentile of 
+                the upper plot is also in descending order.
 
     **kwargs : matplotlib.pyplot.Line2D properties, optional
         This function internally calls matplotlib.pyplot.plot. The argument
@@ -70,7 +71,8 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     """
     risks = np.array(risks)
     labels = np.array(labels)
-    points = np.linspace(0, 1, points)
+    thresholds = np.linspace(0, 1, points + 1)[1:]
+    points = np.linspace(0, 1, points + 1)
 
     if not np.all(np.unique(labels)==np.unique(classes)):
         raise ValueError('The values of labels and classes do not match')
@@ -92,7 +94,10 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
         lambda p: np.count_nonzero(labels[risks>=p])/num_positive, 1, 1)
 
     risk_percentiles = calculate_risk_percentiles(points)
-    true_positive_fractions = calculate_true_positive_fractions(points)
+    risk_percentiles = np.append(0, risk_percentiles)
+    points = np.append(0, points)
+    if kind.upper() == 'EF':
+        risk_percentiles = risk_percentiles[::-1]
 
     margin = 0.03
     lim = (0 - margin, 1 + margin)
@@ -100,15 +105,27 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
 
     ax = fig.add_subplot(2, 1, 1)
     _set_axes(ax, lim, fontsize)
-    ax.plot(np.append(0, risk_percentiles), np.append(0, points), **kwargs)
-    ax.yaxis.set_label_text('Risk percentiles')
+    ax.set_ylim(bottom=lim[0], top=lim[1])
+    ax.plot(risk_percentiles, points, **kwargs)
+    ax.yaxis.set_label_text('Risk')
 
     ax = fig.add_subplot(2, 1, 2)
-    _set_axes(ax, lim, fontsize)
-    ax.plot(np.append(0, risk_percentiles),
-            np.append(1, true_positive_fractions), **kwargs)
-    ax.xaxis.set_label_text('Risk percentiles')
-    ax.yaxis.set_label_text('TPR')
+
+    if kind.upper() == 'TPR':
+        _set_axes(ax, lim, fontsize)
+        ax.set_ylim(bottom=lim[0], top=lim[1])
+        true_positive_fractions = calculate_true_positive_fractions(points)
+        ax.plot(risk_percentiles, true_positive_fractions, **kwargs)
+    elif kind.upper() == 'EF':
+        _set_axes(ax, lim, fontsize)
+        enrichment_factors = calculate_enrichment_factor(risks, labels, threshold=thresholds)
+        ax.plot(thresholds, enrichment_factors, **kwargs)
+    else:
+       raise ValueError(f'kind must be either TPR or EF, not {kind}')
+    xaxis_label = 'Risk percentiles'
+    yaxis_label = kind
+    ax.xaxis.set_label_text(xaxis_label)
+    ax.yaxis.set_label_text(yaxis_label)
     return fig
 
 
