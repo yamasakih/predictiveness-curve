@@ -20,7 +20,8 @@ def _set_axes(ax, lim, fontsize):
 
 
 def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
-    points=100, figsize=(4.5, 10), fontsize=14, kind='TPR', **kwargs):
+    points=100, figsize=(4.5, 10), fontsize=14, kind='TPR', xlabel=None,
+    top_ylabel=None, bottom_ylabel=None, **kwargs):
     """
     Plot predictiveness curve.
 
@@ -57,6 +58,15 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
         * EF  : plot risk percentile vs EF at bottom. The risk percentile of 
                 the upper plot is also in descending order.
 
+    xlabel : str, default Risk percentiles
+        Set the label for the x-axis.
+
+    top_ylabel : str, default Risk
+        Set the label for the y-axis in the top plot.
+
+    bottom_ylabel : str, default value of kind.
+        Set the label for the y-axis in the bottom plot.
+
     **kwargs : matplotlib.pyplot.Line2D properties, optional
         This function internally calls matplotlib.pyplot.plot. The argument
         kwargs is passed to this function.
@@ -84,6 +94,13 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     if normalize:
         risks = _normalize(risks)
 
+    if xlabel is None:
+        xlabel = 'Risk percentiles'
+    if top_ylabel is None:
+        top_ylabel = 'Risk'
+    if bottom_ylabel is None:
+        bottom_ylabel = kind
+
     labels = labels[np.argsort(risks)]
     risks = np.sort(risks)
     num_positive = labels.sum()
@@ -107,7 +124,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     _set_axes(ax, lim, fontsize)
     ax.set_ylim(bottom=lim[0], top=lim[1])
     ax.plot(risk_percentiles, points, **kwargs)
-    ax.yaxis.set_label_text('Risk')
+    ax.yaxis.set_label_text(top_ylabel)
 
     ax = fig.add_subplot(2, 1, 2)
 
@@ -122,10 +139,8 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
         ax.plot(thresholds, enrichment_factors, **kwargs)
     else:
        raise ValueError(f'kind must be either TPR or EF, not {kind}')
-    xaxis_label = 'Risk percentiles'
-    yaxis_label = kind
-    ax.xaxis.set_label_text(xaxis_label)
-    ax.yaxis.set_label_text(yaxis_label)
+    ax.xaxis.set_label_text(xlabel)
+    ax.yaxis.set_label_text(bottom_ylabel)
     return fig
 
 

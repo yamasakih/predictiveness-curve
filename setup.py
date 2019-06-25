@@ -15,7 +15,7 @@ setup(
     python_requires='>=3.6',
     author='Hiroyuki Yamasaki',
     author_email='yamasaki.phone@gmail.com',
-    install_requires=['matplotlib'],
+    install_requires=['matplotlib', 'numpy'],
     description='Plot predictiveness curve',
     long_description=long_description,
     long_description_content_type='text/markdown',
