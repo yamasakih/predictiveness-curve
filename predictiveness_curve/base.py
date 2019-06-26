@@ -105,22 +105,16 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     risks = np.sort(risks)
     num_positive = labels.sum()
 
-    if kind.upper() == 'TPR':
-        calculate_risk_percentiles = np.frompyfunc(
-            lambda p: np.count_nonzero(risks<=p)/len(risks), 1, 1)
-        risk_percentiles = calculate_risk_percentiles(points)
-        risk_percentiles = np.append(0, risk_percentiles)
-        points = np.append(0, points)
-    elif kind.upper() == 'EF':
-        labels = labels[::-1]
-        risks = risks[::-1]
-        calculate_risk_percentiles = np.frompyfunc(
-            lambda p: np.count_nonzero(risks>=p)/len(risks), 1, 1)
-        risk_percentiles = calculate_risk_percentiles(points)
-        risk_percentiles = np.append(risk_percentiles, 0)
-        points = np.append(points, 1)
-    else:
-        raise ValueError(f'kind must be either TPR or EF, not {kind}')
+    calculate_risk_percentiles = np.frompyfunc(
+        lambda p: np.count_nonzero(risks<=p)/len(risks), 1, 1)
+    calculate_true_positive_fractions = np.frompyfunc(
+        lambda p: np.count_nonzero(labels[risks>=p])/num_positive, 1, 1)
+
+    risk_percentiles = calculate_risk_percentiles(points)
+    risk_percentiles = np.append(0, risk_percentiles)
+    points = np.append(0, points)
+    if kind.upper() == 'EF':
+        risk_percentiles = risk_percentiles[::-1]
 
     margin = 0.03
     lim = (0 - margin, 1 + margin)
@@ -135,24 +129,22 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
     ax = fig.add_subplot(2, 1, 2)
 
     if kind.upper() == 'TPR':
-        calculate_true_positive_fractions = np.frompyfunc(
-            lambda p: np.count_nonzero(labels[risks>=p])/num_positive, 1, 1)
-        true_positive_fractions = calculate_true_positive_fractions(points)
         _set_axes(ax, lim, fontsize)
         ax.set_ylim(bottom=lim[0], top=lim[1])
+        true_positive_fractions = calculate_true_positive_fractions(points)
         ax.plot(risk_percentiles, true_positive_fractions, **kwargs)
     elif kind.upper() == 'EF':
-        enrichment_factors = calculate_enrichment_factor(risks, labels,
-                                                         threshold=thresholds)
         _set_axes(ax, lim, fontsize)
+        enrichment_factors = calculate_enrichment_factor(risks, labels, threshold=thresholds)
         ax.plot(thresholds, enrichment_factors, **kwargs)
+    else:
+       raise ValueError(f'kind must be either TPR or EF, not {kind}')
     ax.xaxis.set_label_text(xlabel)
     ax.yaxis.set_label_text(bottom_ylabel)
     return fig
 
 
-def calculate_enrichment_factor(scores, labels, classes=[0, 1],
-                                threshold=0.01):
+def calculate_enrichment_factor(scores, labels, classes=[0, 1], threshold=0.01):
     """
     Calculate enrichment factor.
 
