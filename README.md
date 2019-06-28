@@ -14,7 +14,7 @@ Install with :
 
 ## Example
 
-```
+```python
 from predictiveness_curve import plot_predictiveness_curve
 from sklearn.datasets import load_breast_cancer
 from sklearn.ensemble import RandomForestClassifier
