@@ -1,7 +1,6 @@
 from setuptools import setup
 
-from predictiveness_curve import __version__
-
+__version__ = '0.2.1'
 
 with open("README.md") as f:
     long_description = f.read()
