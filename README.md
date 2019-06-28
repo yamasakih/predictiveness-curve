@@ -1,6 +1,8 @@
 # predictiveness-curve
 
-## What's Predictiveness Curve
+[![Downloads](https://pepy.tech/badge/predictiveness-curve)](https://pepy.tech/project/predictiveness-curve) [![Downloads](https://pepy.tech/badge/predictiveness-curve/month)](https://pepy.tech/project/predictiveness-curve/month) [![Downloads](https://pepy.tech/badge/predictiveness-curve/week)](https://pepy.tech/project/predictiveness-curve/week)
+
+## What's Predictiveness Curve?
 Predictiveness curve is a method to display two graphs simultaneously. In both figures, the x-axis is risk percentile, the y-axis of one figure is the value of risk, and the y-axis of the other figure is true positive fractions. This makes it possible to visualize whether the model of risk fits in the medical field and which value of risk should be used as the basis for the model. See [Am. J. Epidemiol. 2008; 167:362–368](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2939738/) for details.
 
 ## Install
@@ -13,12 +15,10 @@ Install with :
 ## Example
 
 ```python
+from predictiveness_curve import plot_predictiveness_curve
 from sklearn.datasets import load_breast_cancer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-
-from predictiveness_curve import plot_predictiveness_curve
-
 
 data = load_breast_cancer()
 y = data.target
