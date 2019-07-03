@@ -6,7 +6,6 @@ python:
 
 install:
     - pip install pipenv
-    - pipenv install --dev
 
 script:
     - pipenv run pytest -v --cov=predictiveness_curve/ --cov-report=
