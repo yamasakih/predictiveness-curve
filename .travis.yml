@@ -7,8 +7,6 @@ python:
 install:
     - pip install pipenv
     - pipenv install --dev
-    - pipenv install --dev codecov --skip-lock 
 
 script:
-    - pipenv run pytest -v --cov=predictiveness_curve/ --cov-report=
-
+    - pipenv run pytest
