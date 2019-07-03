@@ -4,6 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pytest = "*"
+flake8 = "*"
+mypy = "*"
+sphinx = "*"
+pytest-cov = "*"
+yapf = "*"
 
 [packages]
 numpy = "*"
