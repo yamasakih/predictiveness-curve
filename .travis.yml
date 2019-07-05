@@ -10,3 +10,9 @@ install:
 
 script:
     - pipenv run pytest
+
+after_success:
+    - sphinx-apidoc -f -o docs/source/apis predictiveness_curve
+    - cd docs
+    - make html
+
