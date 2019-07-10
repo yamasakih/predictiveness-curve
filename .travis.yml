@@ -10,3 +10,23 @@ install:
 
 script:
     - pipenv run pytest
+
+after_success:
+    - sphinx-apidoc -f -o docs/source/apis predictiveness_curve
+    - cd docs
+    - make html
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  keep-history: false
+  on:
+    branch:feature/Add-document
+  github-token: $GITHUB_TOKEN
+  local-dir: docs/build/html
+  commiteer-from-gh: true
+
+env:
+  global:
+    secure: q66tvAAAEqvFWgri3K23wrn6ISW7iRVBLaQOsj7dh8cx6GG6201GD//JwVh3kV7HtY4l6cRD2UfYYBKQkJEnvEermJ59buQPmzpVFZcmXJVp9P63/iwjOBxXzdR8UvGYaKi+a1xTlz0xfAQAeiCF0PXLTJh0JTyVBNlyS8l8/a5cP2DlhJt9HV8xWz9bTrhhlKN6IqMB778KECsqGrKTKO6ZwESGCjgdxOPgObM6TtUh4UsYBMC47K5uHHwtaNJYTqdWCy9orZ11UPMQIg5U3K2IjNjR9GT8HZDn/4rqluKDZgVFuRZshu1CbrhMZI3G1sL8zNU7rVKyaMGT1kYnXXjS7EbdoJLy20cx2+Cd670ubydanjN7KVdI7E41dVCMtBxL/aeX++bZZdN2oXDziSQwKCe9tadYjfyASTUECpYhGF72IQ6yAKZ7oYSY2GyhnHxnltZqh7wVpF6bcbDCJBoUId/urNxVTvObv8xQia4P8M+ltm2XIMQkZUicJaoJVJfDUhdj09jAUgseKXlgegr6I7R8p33OvXNXq+CMH5RFHjAJHf4gm/SDmQQRz08JRHhWBUd4kfCeaNcxpl+mN8KTcU4jRyN+y82EPSj5tk29xYN5QVcMPEw9NydJ6QwUTb52qfnKcwTTwhpEHuZkSiNWUSnQRxsKhjkkWzHxik8=
+

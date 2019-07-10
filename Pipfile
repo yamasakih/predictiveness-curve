@@ -10,6 +10,7 @@ mypy = "*"
 sphinx = "*"
 pytest-cov = "*"
 yapf = "*"
+sphinx-rtd-theme = "*"
 
 [packages]
 numpy = "*"
