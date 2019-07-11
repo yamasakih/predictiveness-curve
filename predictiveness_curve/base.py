@@ -9,7 +9,7 @@ __all__ = [
 
 
 def _normalize(arr):
-    return (arr-arr.min()) / (arr.max()-arr.min())
+    return (arr - arr.min()) / (arr.max() - arr.min())
 
 
 def _set_axes(ax, lim, fontsize):
@@ -19,10 +19,18 @@ def _set_axes(ax, lim, fontsize):
     ax.yaxis.label.set_fontsize(fontsize)
 
 
-def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
-                              points=100, figsize=(4.5, 10), fontsize=14,
-                              kind='TPR', xlabel=None, top_ylabel=None,
-                              bottom_ylabel=None, **kwargs):
+def plot_predictiveness_curve(risks,
+                              labels,
+                              classes=[0, 1],
+                              normalize=False,
+                              points=100,
+                              figsize=(4.5, 10),
+                              fontsize=14,
+                              kind='TPR',
+                              xlabel=None,
+                              top_ylabel=None,
+                              bottom_ylabel=None,
+                              **kwargs):
     """
     Plot predictiveness curve.
 
@@ -108,7 +116,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
 
     if kind.upper() == 'TPR':
         calculate_risk_percentiles = np.frompyfunc(
-            lambda p: np.count_nonzero(risks <= p)/len(risks), 1, 1)
+            lambda p: np.count_nonzero(risks <= p) / len(risks), 1, 1)
         risk_percentiles = calculate_risk_percentiles(points)
         risk_percentiles = np.append(0, risk_percentiles)
         points = np.append(0, points)
@@ -116,7 +124,7 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
         labels = labels[::-1]
         risks = risks[::-1]
         calculate_risk_percentiles = np.frompyfunc(
-            lambda p: np.count_nonzero(risks >= p)/len(risks), 1, 1)
+            lambda p: np.count_nonzero(risks >= p) / len(risks), 1, 1)
         risk_percentiles = calculate_risk_percentiles(points)
         risk_percentiles = np.append(risk_percentiles, 0)
         points = np.append(points, 1)
@@ -137,13 +145,15 @@ def plot_predictiveness_curve(risks, labels, classes=[0, 1], normalize=False,
 
     if kind.upper() == 'TPR':
         calculate_true_positive_fractions = np.frompyfunc(
-            lambda p: np.count_nonzero(labels[risks >= p])/num_positive, 1, 1)
+            lambda p: np.count_nonzero(labels[risks >= p]) / num_positive, 1,
+            1)
         true_positive_fractions = calculate_true_positive_fractions(points)
         _set_axes(ax, lim, fontsize)
         ax.set_ylim(bottom=lim[0], top=lim[1])
         ax.plot(risk_percentiles, true_positive_fractions, **kwargs)
     elif kind.upper() == 'EF':
-        enrichment_factors = calculate_enrichment_factor(risks, labels,
+        enrichment_factors = calculate_enrichment_factor(risks,
+                                                         labels,
                                                          threshold=thresholds)
         _set_axes(ax, lim, fontsize)
         ax.plot(thresholds, enrichment_factors, **kwargs)
@@ -183,6 +193,7 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
         Return enrichment factors. If threshold is int or float, return one
         value. If threshold is array_like, return ndarray.
     """
+
     def f(threshold):
         n = int(np.floor(scores.size * threshold))
         return (np.count_nonzero(labels[-n:]) / n) / positive_ratio
@@ -235,4 +246,7 @@ def convert_label_to_zero_or_one(labels, classes):
     converted label : ndarray, shape = [n_samples]
         Return ndarray which converted labels to 0 and 1.
     """
+    if not np.all(np.unique(labels) == np.unique(classes)):
+        raise ValueError('The values of labels and classes do not match')
+    labels = np.asarray(labels)
     return (labels == classes[1]).astype('int16')
