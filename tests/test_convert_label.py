@@ -44,3 +44,17 @@ def test_classes_type(classes):
     actual = convert_label_to_zero_or_one(labels, classes)
     expect = np.array([1, 1, 0, 0, 1])
     np.testing.assert_array_equal(actual, expect)
+
+
+def test_labels_and_classes_unmatch():
+    labels = np.array([0, 1, 1])
+    classes = np.array(['a', 'b'])
+    with pytest.raises(ValueError):
+        convert_label_to_zero_or_one(labels, classes)
+
+
+def test_more_than_two_labels():
+    labels = np.array([0, 1, 1, 2])
+    classes = np.array([0, 1])
+    with pytest.raises(ValueError):
+        convert_label_to_zero_or_one(labels, classes)

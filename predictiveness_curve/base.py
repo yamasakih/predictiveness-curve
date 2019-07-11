@@ -246,5 +246,7 @@ def convert_label_to_zero_or_one(labels, classes):
     converted label : ndarray, shape = [n_samples]
         Return ndarray which converted labels to 0 and 1.
     """
+    if not np.all(np.unique(labels) == np.unique(classes)):
+        raise ValueError('The values of labels and classes do not match')
     labels = np.asarray(labels)
     return (labels == classes[1]).astype('int16')
