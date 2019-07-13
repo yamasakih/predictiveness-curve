@@ -18,7 +18,6 @@
 import predictiveness_curve
 import sphinx_rtd_theme
 
-
 # -- Project information -----------------------------------------------------
 
 project = 'predictiveness-curve'
@@ -26,8 +25,7 @@ copyright = '2019, yamasakih'
 author = 'yamasakih'
 
 # The full version, including alpha/beta/rc tags
-release = predictiveness_curve.__version__ 
-
+release = predictiveness_curve.__version__
 
 # -- General configuration ---------------------------------------------------
 
@@ -70,7 +68,6 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -100,12 +97,10 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
-
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'predictiveness-curvedoc'
-
 
 # -- Options for LaTeX output ------------------------------------------------
 
@@ -131,20 +126,16 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'predictiveness-curve.tex', 'predictiveness-curve Documentation',
-     'yamasakih', 'manual'),
+    (master_doc, 'predictiveness-curve.tex',
+     'predictiveness-curve Documentation', 'yamasakih', 'manual'),
 ]
-
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'predictiveness-curve', 'predictiveness-curve Documentation',
-     [author], 1)
-]
-
+man_pages = [(master_doc, 'predictiveness-curve',
+              'predictiveness-curve Documentation', [author], 1)]
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -156,6 +147,5 @@ texinfo_documents = [
      author, 'predictiveness-curve', 'One line description of project.',
      'Miscellaneous'),
 ]
-
 
 # -- Extension configuration -------------------------------------------------
