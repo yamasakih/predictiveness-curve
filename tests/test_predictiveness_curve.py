@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
+from predictiveness_curve import plot_predictiveness_curve
 from predictiveness_curve.base import _normalize
 from predictiveness_curve.base import _set_axes
 
@@ -48,4 +49,124 @@ def test_set_axes(lim, fontsize):
 
     actual = ax.yaxis.label.get_fontsize()
     expect = fontsize
+    assert actual == expect
+
+
+def test_predictiveness_curve():
+    scores = np.array([10, 9, 5, 1, 8, 7, 6, 4, 3, 2])
+    labels = np.zeros((10, ), dtype='int32')
+    labels[:4] = 1
+
+    fig = plot_predictiveness_curve(scores, labels, kind='TPR')
+    axes = fig.get_axes()
+
+    actual = len(axes)
+    expect = 2
+    assert actual == expect
+
+    ax = axes[0]
+    actual = ax.get_xlim()
+    expect = (-0.03, 1.03)
+    assert np.array_equal(actual, expect)
+
+    actual = ax.get_ylim()
+    expect = (-0.03, 1.03)
+    assert np.array_equal(actual, expect)
+
+    actual = ax.xaxis.label.get_fontsize()
+    expect = 14.0
+    assert actual == expect
+
+    actual = ax.yaxis.label.get_fontsize()
+    expect = 14.0
+    assert actual == expect
+
+    actual = ax.xaxis.get_label_text()
+    expect = ''
+    assert actual == expect
+
+    actual = ax.yaxis.get_label_text()
+    expect = 'Risk'
+    assert actual == expect
+
+    ax = axes[1]
+    actual = ax.get_xlim()
+    expect = (-0.03, 1.03)
+    assert np.array_equal(actual, expect)
+
+    actual = ax.get_ylim()
+    expect = (-0.03, 1.03)
+    assert np.array_equal(actual, expect)
+
+    actual = ax.xaxis.label.get_fontsize()
+    expect = 14.0
+    assert actual == expect
+
+    actual = ax.yaxis.label.get_fontsize()
+    expect = 14.0
+    assert actual == expect
+
+    actual = ax.xaxis.get_label_text()
+    expect = 'Risk percentiles'
+    assert actual == expect
+
+    actual = ax.yaxis.get_label_text()
+    expect = 'TPR'
+    assert actual == expect
+
+    fig = plot_predictiveness_curve(scores, labels, kind='EF')
+    axes = fig.get_axes()
+
+    actual = len(axes)
+    expect = 2
+    assert actual == expect
+
+    ax = axes[0]
+    actual = ax.get_xlim()
+    expect = (-0.03, 1.03)
+    assert np.array_equal(actual, expect)
+
+    actual = ax.get_ylim()
+    expect = (-0.03, 1.03)
+    assert np.array_equal(actual, expect)
+
+    actual = ax.xaxis.label.get_fontsize()
+    expect = 14.0
+    assert actual == expect
+
+    actual = ax.yaxis.label.get_fontsize()
+    expect = 14.0
+    assert actual == expect
+
+    actual = ax.xaxis.get_label_text()
+    expect = ''
+    assert actual == expect
+
+    actual = ax.yaxis.get_label_text()
+    expect = 'Risk'
+    assert actual == expect
+
+    ax = axes[1]
+    actual = ax.get_xlim()
+    expect = (-0.03, 1.03)
+    assert np.array_equal(actual, expect)
+
+    actual = ax.get_ylim()
+    expect = (-0.03, 1.03)
+    assert np.array_equal(actual, expect)
+
+    actual = ax.xaxis.label.get_fontsize()
+    expect = 14.0
+    assert actual == expect
+
+    actual = ax.yaxis.label.get_fontsize()
+    expect = 14.0
+    assert actual == expect
+
+    actual = ax.xaxis.get_label_text()
+    expect = 'Risk percentiles'
+    assert actual == expect
+
+    actual = ax.yaxis.get_label_text()
+    expect = 'TPR'
     assert actual == expect
