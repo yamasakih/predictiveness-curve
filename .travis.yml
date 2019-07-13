@@ -10,7 +10,7 @@ install:
     - pipenv install --dev codecov --skip-lock
 
 script:
-    - pipenv run pytest -v --cov=library_template/ --cov-report=
+    - pipenv run pytest -v --cov=predictiveness_curve/ --cov-report=
     - flake8
 
 after_success:
