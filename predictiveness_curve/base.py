@@ -225,7 +225,21 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
     positive_ratio = np.count_nonzero(labels) / scores.size
 
     _calculate_enrichment_factor = np.frompyfunc(f, 1, 1)
-    return _calculate_enrichment_factor(threshold)
+    enrichment_factors = _calculate_enrichment_factor(threshold)
+    if isinstance(enrichment_factors, float):
+        return_float = True
+        enrichment_factors = np.array([enrichment_factors], dtype='float32')
+    else:
+        return_float = False
+        enrichment_factors = enrichment_factors.astype('float32')
+    if np.any(np.isnan(enrichment_factors)):
+        warnings.warn(
+            'Returns one as the value of enrichment factor because the '
+            'product of sample data and threshold is less than one')
+        enrichment_factors[np.isnan(enrichment_factors)] = 1.0
+    if return_float:
+        enrichment_factors = enrichment_factors[0]
+    return enrichment_factors
 
 
 def convert_label_to_zero_or_one(labels, classes):
