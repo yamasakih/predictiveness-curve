@@ -12,6 +12,7 @@ pytest-cov = "*"
 yapf = "*"
 sphinx-rtd-theme = "*"
 pandas = "*"
+scikit-learn = "*"
 
 [packages]
 numpy = "*"
