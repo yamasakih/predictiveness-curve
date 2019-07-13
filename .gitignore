@@ -102,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# VSCode
+/.vscode
+
+# pipenv
+/.venv
+
+examples.py
+docs/source/apis/*.rst
