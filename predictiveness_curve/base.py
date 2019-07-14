@@ -231,18 +231,18 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
     _calculate_enrichment_factor = np.frompyfunc(f, 1, 1)
     enrichment_factors = _calculate_enrichment_factor(threshold)
     if isinstance(enrichment_factors, float):
-        if enrichment_factors is np.nan:
-            enrichment_factors = 1
-            warnings.warn(
-                'Returns one as the value of enrichment factor because the '
-                'product of sample data and threshold is less than one')
-    elif isinstance(enrichment_factors, np.ndarray):
+        return_float = True
+        enrichment_factors = np.array([enrichment_factors], dtype='float32')
+    else:
+        return_float = False
         enrichment_factors = enrichment_factors.astype('float32')
-        if np.any(np.isnan(enrichment_factors)):
-            warnings.warn(
-                'Returns one as the value of enrichment factor because the '
-                'product of sample data and threshold is less than one')
-            enrichment_factors[np.isnan(enrichment_factors)] = 1
+    if np.any(np.isnan(enrichment_factors)):
+        warnings.warn(
+            'Returns one as the value of enrichment factor because the '
+            'product of sample data and threshold is less than one')
+        enrichment_factors[np.isnan(enrichment_factors)] = 1.0
+    if return_float:
+        enrichment_factors = enrichment_factors[0]
     return enrichment_factors
 
 
