@@ -113,7 +113,7 @@ def test_predictiveness_curve():
     actual = ax.yaxis.get_label_text()
     expect = 'TPR'
     assert actual == expect
-
+    """
     fig = plot_predictiveness_curve(scores, labels, kind='EF')
     axes = fig.get_axes()
 
@@ -170,3 +170,8 @@ def test_predictiveness_curve():
     actual = ax.yaxis.get_label_text()
     expect = 'TPR'
     assert actual == expect
+    """
+
+
+if __name__ == '__main__':
+    pytest.main([__file__, '-v'])

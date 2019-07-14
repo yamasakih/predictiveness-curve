@@ -1,3 +1,5 @@
+import warnings
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -193,9 +195,10 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
         Return enrichment factors. If threshold is int or float, return one
         value. If threshold is array_like, return ndarray.
     """
-
     def f(threshold):
         n = int(np.floor(scores.size * threshold))
+        if n == 0:
+            return np.nan
         return (np.count_nonzero(labels[-n:]) / n) / positive_ratio
 
     scores = np.array(scores)
@@ -206,7 +209,8 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
         raise ValueError('Invalid value for threshold. Threshold should be '
                          'either positive and smaller a int or ints than 100 '
                          'or a float in the (0, 1) range')
-    elif threshold.dtype.kind == 'f' and np.any(threshold > 1):
+    elif threshold.dtype.kind == 'f' and (np.any(threshold <= 0)
+                                          or np.any(threshold > 1)):
         raise ValueError('Invalid value for threshold. Threshold should be '
                          'either positive and a float or floats in the (0, 1) '
                          'range')

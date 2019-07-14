@@ -78,3 +78,78 @@ def test_calculate_enrichiment_factor_for_probabilities_():
                                          threshold=[0.01, 0.05, 0.6, 0.8, 1])
     expect = np.array([1.5240, 1.5240, 1.5151, 1.25, 1.0])
     np.testing.assert_almost_equal(actual, expect, decimal=4)
+
+
+@pytest.mark.parametrize('threshold', [
+    (150),
+    (120),
+    (101),
+    (0),
+    (-10),
+    (-50),
+    ([150, 120]),
+    ([150, 80, 60, 20]),
+    ([120, 50, 0, -100, 250]),
+])
+def test_int_threshold(threshold):
+    scores = np.array([0, 0, 0, 0, 0])
+    labels = np.array([0, 0, 1, 1, 1])
+    classes = np.array([0, 1])
+    with pytest.raises(ValueError) as exc_info:
+        calculate_enrichment_factor(scores, labels, classes,
+                                    threshold=threshold)
+        expect = ('Invalid value for threshold. Threshold should be '
+                  'either positive and smaller a int or ints than 100 '
+                  'or a float in the (0, 1) range')
+        assert exc_info.values.args[0] == expect
+
+
+@pytest.mark.parametrize('threshold', [
+    (150.0),
+    (1.5),
+    (1.01),
+    (-0.01),
+    (-0.5),
+    (-10.0),
+    ([80, 0.5]),
+    ([0.0, 0.1, 0.2, 0.3, 0.4])
+])
+def test_float_threshold(threshold):
+    scores = np.array([0, 0, 0, 0, 0])
+    labels = np.array([0, 0, 1, 1, 1])
+    classes = np.array([0, 1])
+    with pytest.raises(ValueError) as exc_info:
+        calculate_enrichment_factor(scores, labels, classes,
+                                    threshold=threshold)
+        expect = ('Invalid value for threshold. Threshold should be '
+                  'either positive and smaller a int or ints than 100 '
+                  'or a float in the (0, 1) range')
+        assert exc_info.values.args[0] == expect
+
+
+def test_labels_and_classes_unmatch():
+    scores = np.array([0, 0, 0, 0, 0])
+    labels = np.array([0, 1, 1, 1, 2])
+    classes = np.array([0, 1])
+    with pytest.raises(ValueError,
+                       match='The values of labels and classes do not match'):
+        calculate_enrichment_factor(scores, labels, classes)
+
+
+def test_warning():
+    scores = np.array([10, 9, 5, 1, 8, 7, 6, 4, 3, 2])
+    labels = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0])
+
+    with pytest.warns(UserWarning) as exc_info:
+        actual = calculate_enrichment_factor(scores, labels, threshold=0.01)
+        expect = 1
+        assert actual == expect
+
+        actual = exc_info[0].message.args[0]
+        expect = ('Returns one as the value of enrichment factor because the '
+                  'product of sample data and threshold is less than one')
+        assert actual == expect
+
+
+if __name__ == '__main__':
+    pytest.main([__file__, '-v'])
