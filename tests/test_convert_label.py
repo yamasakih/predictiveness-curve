@@ -49,12 +49,14 @@ def test_classes_type(classes):
 def test_labels_and_classes_unmatch():
     labels = np.array([0, 1, 1])
     classes = np.array(['a', 'b'])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError,
+                       match='The values of labels and classes do not match'):
         convert_label_to_zero_or_one(labels, classes)
 
 
 def test_more_than_two_labels():
     labels = np.array([0, 1, 1, 2])
     classes = np.array([0, 1])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError,
+                       match='The values of labels and classes do not match'):
         convert_label_to_zero_or_one(labels, classes)

@@ -113,7 +113,7 @@ def test_predictiveness_curve():
     actual = ax.yaxis.get_label_text()
     expect = 'TPR'
     assert actual == expect
-    """
+
     fig = plot_predictiveness_curve(scores, labels, kind='EF')
     axes = fig.get_axes()
 
@@ -151,9 +151,9 @@ def test_predictiveness_curve():
     expect = (-0.03, 1.03)
     assert np.array_equal(actual, expect)
 
-    actual = ax.get_ylim()
-    expect = (-0.03, 1.03)
-    assert np.array_equal(actual, expect)
+    actual = np.array(ax.get_ylim())
+    expect = np.array([0.7500, 2.5833])
+    np.testing.assert_almost_equal(actual, expect, decimal=4)
 
     actual = ax.xaxis.label.get_fontsize()
     expect = 14.0
@@ -168,9 +168,17 @@ def test_predictiveness_curve():
     assert actual == expect
 
     actual = ax.yaxis.get_label_text()
-    expect = 'TPR'
+    expect = 'EF'
     assert actual == expect
-    """
+
+
+def test_kind_error():
+    with pytest.raises(ValueError,
+                       match='kind must be either TPR or EF, not XXX'):
+        scores = np.array([10, 9, 5, 1, 8, 7, 6, 4, 3, 2])
+        labels = np.zeros((10, ), dtype='int32')
+        labels[:4] = 1
+        _ = plot_predictiveness_curve(scores, labels, kind='XXX')
 
 
 if __name__ == '__main__':

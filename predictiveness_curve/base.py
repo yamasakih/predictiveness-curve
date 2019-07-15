@@ -34,7 +34,14 @@ def plot_predictiveness_curve(risks,
                               bottom_ylabel=None,
                               **kwargs):
     """
-    Plot predictiveness curve.
+    Plot predictiveness curve. Predictiveness curve is a method to display two
+    graphs simultaneously. In both figures, the x-axis is risk percentile, the
+    y-axis of one figure is the value of risk, and the y-axis of the other
+    figure is true positive fractions. See Am. J. Epidemiol. 2008; 167:362–368
+    for details.
+
+    The plot of EF at the threshold value where the product with the sample
+    data is less than 1 are not displayed.
 
     Parameters
     ----------
@@ -154,6 +161,12 @@ def plot_predictiveness_curve(risks,
         ax.set_ylim(bottom=lim[0], top=lim[1])
         ax.plot(risk_percentiles, true_positive_fractions, **kwargs)
     elif kind.upper() == 'EF':
+        n = np.floor(risks.shape[0] * thresholds).astype('int32')
+        if np.any(n == 0):
+            warnings.warn(
+                'The plot of EF at the threshold value where the product with '
+                'the sample data is less than 1 is not displayed.')
+            thresholds = thresholds[n != 0]
         enrichment_factors = calculate_enrichment_factor(risks,
                                                          labels,
                                                          threshold=thresholds)
@@ -167,7 +180,8 @@ def plot_predictiveness_curve(risks,
 def calculate_enrichment_factor(scores, labels, classes=[0, 1],
                                 threshold=0.01):
     """
-    Calculate enrichment factor.
+    Calculate enrichment factor. Returns one as the value of enrichment factor
+    when the product of sample data and threshold is less than one.
 
     Parameters
     ----------
