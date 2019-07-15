@@ -109,5 +109,5 @@ venv.bak/
 # pipenv
 /.venv
 
-examples.py
+notebooks/example.py
 docs/source/apis/*.rst
