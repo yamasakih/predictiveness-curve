@@ -124,19 +124,29 @@ def plot_predictiveness_curve(risks,
     num_positive = labels.sum()
 
     if kind.upper() == 'TPR':
-        calculate_risk_percentiles = np.frompyfunc(
-            lambda p: np.count_nonzero(risks <= p) / len(risks), 1, 1)
+
+        def f(point):
+            count = np.count_nonzero(risks <= point)
+            return count / len(risks) if count > 0 else 0
+
+        calculate_risk_percentiles = np.frompyfunc(f, 1, 1)
         risk_percentiles = calculate_risk_percentiles(points)
         risk_percentiles = np.append(0, risk_percentiles)
         points = np.append(0, points)
+
     elif kind.upper() == 'EF':
+
+        def f(point):
+            count = np.count_nonzero(risks >= point)
+            return count / len(risks) if count > 0 else 0
+
         labels = labels[::-1]
         risks = risks[::-1]
-        calculate_risk_percentiles = np.frompyfunc(
-            lambda p: np.count_nonzero(risks >= p) / len(risks), 1, 1)
+        calculate_risk_percentiles = np.frompyfunc(f, 1, 1)
         risk_percentiles = calculate_risk_percentiles(points)
         risk_percentiles = np.append(risk_percentiles, 0)
         points = np.append(points, 1)
+
     else:
         raise ValueError(f'kind must be either TPR or EF, not {kind}')
 
