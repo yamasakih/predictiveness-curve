@@ -329,5 +329,34 @@ def test_calculate_risk_percentiles_for_TPR():
     np.testing.assert_almost_equal(actual, expect, decimal=4)
 
 
+def test_calculate_risk_percentiles_for_EF():
+    def f(point):
+        count = np.count_nonzero(risks >= point)
+        return count / len(risks) if count > 0 else 0
+
+    calculate_risk_percentiles = np.frompyfunc(f, 1, 1)
+
+    risks = np.array(
+        [1.0, 0.89, 0.44, 0.11, 0.78, 0.67, 0.56, 0.33, 0.22, 0.11])
+    points = np.array([1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0])
+    actual = calculate_risk_percentiles(points)
+    expect = np.array([0.1, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.0])
+    np.testing.assert_almost_equal(actual, expect, decimal=2)
+
+    risks = np.array(
+        [0.91, 0.89, 0.44, 0.01, 0.78, 0.67, 0.56, 0.33, 0.22, 0.11])
+    points = np.array([1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0])
+    actual = calculate_risk_percentiles(points)
+    expect = np.array([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+    np.testing.assert_almost_equal(actual, expect, decimal=4)
+
+    risks = np.array(
+        [0.91, 0.91, 0.44, 0.01, 0.78, 0.67, 0.56, 0.33, 0.22, 0.05])
+    points = np.array([1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0])
+    actual = calculate_risk_percentiles(points)
+    expect = np.array([0.0, 0.2, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.8, 1.0])
+    np.testing.assert_almost_equal(actual, expect, decimal=4)
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
