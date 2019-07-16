@@ -240,7 +240,7 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
                          'either positive and a float or floats in the (0, 1) '
                          'range')
     elif threshold.dtype.kind == 'i':
-        threshold = threshold.astype('float32') / 10
+        threshold = threshold.astype('float32') / 100
 
     if not np.all(np.unique(labels) == np.unique(classes)):
         raise ValueError('The values of labels and classes do not match')

@@ -91,7 +91,7 @@ def test_calculate_enrichiment_factor_for_probabilities_():
     ([150, 80, 60, 20]),
     ([120, 50, 0, -100, 250]),
 ])
-def test_int_threshold(threshold):
+def test_int_threshold_error(threshold):
     scores = np.array([0, 0, 0, 0, 0])
     labels = np.array([0, 0, 1, 1, 1])
     classes = np.array([0, 1])
@@ -114,7 +114,7 @@ def test_int_threshold(threshold):
     ([80, 0.5]),
     ([0.0, 0.1, 0.2, 0.3, 0.4])
 ])
-def test_float_threshold(threshold):
+def test_float_threshold_error(threshold):
     scores = np.array([0, 0, 0, 0, 0])
     labels = np.array([0, 0, 1, 1, 1])
     classes = np.array([0, 1])
@@ -125,6 +125,23 @@ def test_float_threshold(threshold):
                   'either positive and smaller a int or ints than 100 '
                   'or a float in the (0, 1) range')
         assert exc_info.values.args[0] == expect
+
+
+def test_int_threshold():
+    scores = np.array([10, 9, 5, 1, 8, 7, 6, 4, 3, 2])
+    labels = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0])
+    classes = np.array([0, 1])
+    threshold = 20
+    actual = calculate_enrichment_factor(scores, labels, classes,
+                                         threshold=threshold)
+    expect = 2.5
+    assert actual == expect
+
+    threshold = [20, 50]
+    actual = calculate_enrichment_factor(scores, labels, classes,
+                                         threshold=threshold)
+    expect = np.array([2.5, 1.0])
+    np.testing.assert_almost_equal(actual, expect, decimal=1)
 
 
 def test_labels_and_classes_unmatch():
@@ -149,6 +166,23 @@ def test_warning():
         expect = ('Returns one as the value of enrichment factor because the '
                   'product of sample data and threshold is less than one')
         assert actual == expect
+
+
+def test_converting_label():
+    scores = np.array([10, 9, 5, 1, 8, 7, 6, 4, 3, 2])
+    labels = np.array(['c', 'c', 'c', 'c', 'a', 'a', 'a', 'a', 'a', 'a'])
+    classes = ['a', 'c']
+    threshold = 20
+    actual = calculate_enrichment_factor(scores, labels, classes,
+                                         threshold=threshold)
+    expect = 2.5
+    assert actual == expect
+
+    threshold = [20, 50]
+    actual = calculate_enrichment_factor(scores, labels, classes,
+                                         threshold=threshold)
+    expect = np.array([2.5, 1.0])
+    np.testing.assert_almost_equal(actual, expect, decimal=1)
 
 
 if __name__ == '__main__':
