@@ -15,6 +15,7 @@ script:
     - mypy ./predictiveness_curve
 
 after_success:
+    - codecov
     - sphinx-apidoc -f -o docs/source/apis predictiveness_curve
     - cd docs
     - make html
