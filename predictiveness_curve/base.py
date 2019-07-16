@@ -1,3 +1,4 @@
+from typing import Sequence
 import warnings
 
 import matplotlib.pyplot as plt
@@ -14,7 +15,7 @@ def _normalize(arr):
     return (arr - arr.min()) / (arr.max() - arr.min())
 
 
-def _set_axes(ax, lim, fontsize):
+def _set_axes(ax, lim, fontsize: int):
     ax.set_xlim(left=lim[0], right=lim[1])
     ax.grid(True)
     ax.xaxis.label.set_fontsize(fontsize)
@@ -23,15 +24,15 @@ def _set_axes(ax, lim, fontsize):
 
 def plot_predictiveness_curve(risks,
                               labels,
-                              classes=[0, 1],
-                              normalize=False,
-                              points=100,
-                              figsize=(4.5, 10),
-                              fontsize=14,
-                              kind='TPR',
-                              xlabel=None,
-                              top_ylabel=None,
-                              bottom_ylabel=None,
+                              classes: Sequence = [0, 1],
+                              normalize: bool = False,
+                              points: int = 100,
+                              figsize: Sequence = (4.5, 10),
+                              fontsize: int = 14,
+                              kind: str = 'TPR',
+                              xlabel: str = None,
+                              top_ylabel: str = None,
+                              bottom_ylabel: str = None,
                               **kwargs):
     """
     Plot predictiveness curve. Predictiveness curve is a method to display two
@@ -105,7 +106,7 @@ def plot_predictiveness_curve(risks,
     if not np.all(np.unique(labels) == np.unique(classes)):
         raise ValueError('The values of labels and classes do not match')
 
-    default_classes = [0, 1]
+    default_classes = [0, 1]  # Sequence
     if not np.array_equal(classes, default_classes):
         labels = convert_label_to_zero_or_one(labels, classes)
 
@@ -121,12 +122,12 @@ def plot_predictiveness_curve(risks,
 
     labels = labels[np.argsort(risks)]
     risks = np.sort(risks)
-    num_positive = labels.sum()
+    num_positive: int = labels.sum()
 
     if kind.upper() == 'TPR':
 
         def f(point):
-            count = np.count_nonzero(risks <= point)
+            count: int = np.count_nonzero(risks <= point)
             return count / len(risks) if count > 0 else 0
 
         calculate_risk_percentiles = np.frompyfunc(f, 1, 1)
@@ -137,7 +138,7 @@ def plot_predictiveness_curve(risks,
     elif kind.upper() == 'EF':
 
         def f(point):
-            count = np.count_nonzero(risks >= point)
+            count: int = np.count_nonzero(risks >= point)
             return count / len(risks) if count > 0 else 0
 
         labels = labels[::-1]
@@ -150,8 +151,8 @@ def plot_predictiveness_curve(risks,
     else:
         raise ValueError(f'kind must be either TPR or EF, not {kind}')
 
-    margin = 0.03
-    lim = (0 - margin, 1 + margin)
+    margin: float = 0.03
+    lim: Sequence = (0 - margin, 1 + margin)
     fig = plt.figure(figsize=figsize)
 
     ax = fig.add_subplot(2, 1, 1)
@@ -244,7 +245,7 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
     if not np.all(np.unique(labels) == np.unique(classes)):
         raise ValueError('The values of labels and classes do not match')
 
-    default_classes = [0, 1]
+    default_classes: Sequence = [0, 1]
     if not np.array_equal(classes, default_classes):
         labels = convert_label_to_zero_or_one(labels, classes)
 
@@ -255,10 +256,10 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
     _calculate_enrichment_factor = np.frompyfunc(f, 1, 1)
     enrichment_factors = _calculate_enrichment_factor(threshold)
     if isinstance(enrichment_factors, float):
-        return_float = True
+        return_float: bool = True
         enrichment_factors = np.array([enrichment_factors], dtype='float32')
     else:
-        return_float = False
+        return_float: bool = False
         enrichment_factors = enrichment_factors.astype('float32')
     if np.any(np.isnan(enrichment_factors)):
         warnings.warn(

@@ -12,6 +12,7 @@ install:
 script:
     - pipenv run pytest -v --cov=predictiveness_curve/ --cov-report=
     - flake8
+    - mypy ./predictiveness_curve
 
 after_success:
     - sphinx-apidoc -f -o docs/source/apis predictiveness_curve

@@ -310,7 +310,7 @@ def test_kind_error():
 
 def test_calculate_risk_percentiles_for_TPR():
     def f(point):
-        count = np.count_nonzero(risks <= point)
+        count: int = np.count_nonzero(risks <= point)
         return count / len(risks) if count > 0 else 0
 
     calculate_risk_percentiles = np.frompyfunc(f, 1, 1)
@@ -331,7 +331,7 @@ def test_calculate_risk_percentiles_for_TPR():
 
 def test_calculate_risk_percentiles_for_EF():
     def f(point):
-        count = np.count_nonzero(risks >= point)
+        count: int = np.count_nonzero(risks >= point)
         return count / len(risks) if count > 0 else 0
 
     calculate_risk_percentiles = np.frompyfunc(f, 1, 1)
