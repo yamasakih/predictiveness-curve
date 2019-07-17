@@ -75,7 +75,7 @@ def plot_predictiveness_curve(risks,
     kind : str, default TPR
         * TPR : plot risk percentile vs TPR at bottom.
         * EF  : plot risk percentile vs EF at bottom. The risk percentile of
-                the upper plot is also in descending order.
+          the upper plot is also in descending order.
 
     xlabel : str, default Risk percentiles
         Set the label for the x-axis.
