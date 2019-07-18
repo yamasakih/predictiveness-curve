@@ -25,7 +25,7 @@ deploy:
   skip-cleanup: true
   keep-history: false
   on:
-    branch:feature/Add-document
+    branch:master
   github-token: $GITHUB_TOKEN
   local-dir: docs/build/html
   commiteer-from-gh: true
