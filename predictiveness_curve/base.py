@@ -174,9 +174,10 @@ def plot_predictiveness_curve(risks,
     elif kind.upper() == 'EF':
         n = np.floor(risks.shape[0] * thresholds).astype('int32')
         if np.any(n == 0):
-            warnings.warn(
+            warning_message = (
                 'The plot of EF at the threshold value where the product with '
                 'the sample data is less than 1 is not displayed.')
+            warnings.warn(warning_message)
             thresholds = thresholds[n != 0]
         enrichment_factors = calculate_enrichment_factor(risks,
                                                          labels,
@@ -262,9 +263,10 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
         return_float: bool = False
         enrichment_factors = enrichment_factors.astype('float32')
     if np.any(np.isnan(enrichment_factors)):
-        warnings.warn(
-            'Returns one as the value of enrichment factor because the '
-            'product of sample data and threshold is less than one')
+        warning_message = (
+            'Returns one as the value of enrichment factor because '
+            'the product of sample data and threshold is less than one')
+        warnings.warn(warning_message)
         enrichment_factors[np.isnan(enrichment_factors)] = 1.0
     if return_float:
         enrichment_factors = enrichment_factors[0]
