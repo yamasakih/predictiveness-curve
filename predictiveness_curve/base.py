@@ -6,7 +6,6 @@ import numpy as np
 from bokeh.plotting import figure, show
 from bokeh.layouts import column
 
-
 __all__ = [
     "calculate_enrichment_factor",
     "convert_label_to_zero_or_one",
@@ -26,18 +25,18 @@ def _set_axes(ax, lim, fontsize: int):
 
 
 def plot_predictiveness_curve(
-    risks,
-    labels,
-    classes: Sequence = [0, 1],
-    normalize: bool = False,
-    points: int = 100,
-    figsize: Sequence = (400, 340),
-    fontsize: int = 12,
-    kind: str = "TPR",
-    xlabel: str = None,
-    top_ylabel: str = None,
-    bottom_ylabel: str = None,
-    **kwargs,
+        risks,
+        labels,
+        classes: Sequence = [0, 1],
+        normalize: bool = False,
+        points: int = 100,
+        figsize: Sequence = (400, 340),
+        fontsize: int = 12,
+        kind: str = "TPR",
+        xlabel: str = None,
+        top_ylabel: str = None,
+        bottom_ylabel: str = None,
+        **kwargs,
 ):
     """
     Plot predictiveness curve. Predictiveness curve is a method to display two
@@ -159,25 +158,30 @@ def plot_predictiveness_curve(
     margin: float = 0.03
     lim: Sequence = (0 - margin, 1 + margin)
 
-    fig_top = figure(plot_width=400, plot_height=340,
-                     x_range=(lim[0], lim[1]), y_range=(lim[0], lim[1]),
-                     y_axis_label=top_ylabel,
-                     )
+    fig_top = figure(
+        plot_width=figsize[0],
+        plot_height=figsize[1],
+        x_range=(lim[0], lim[1]),
+        y_range=(lim[0], lim[1]),
+        y_axis_label=top_ylabel,
+    )
     fig_top.yaxis.axis_label_text_font_size = f"{fontsize}pt"
     fig_top.line(risk_percentiles, points, **kwargs)
 
-    fig_bottom = figure(plot_width=figsize[0], plot_height=figsize[1],
-                        x_range=fig_top.x_range,
-                        x_axis_label=xlabel,
-                        y_axis_label=bottom_ylabel,
-                        )
+    fig_bottom = figure(
+        plot_width=figsize[0],
+        plot_height=figsize[1],
+        x_range=fig_top.x_range,
+        x_axis_label=xlabel,
+        y_axis_label=bottom_ylabel,
+    )
     fig_bottom.xaxis.axis_label_text_font_size = f"{fontsize}pt"
     fig_bottom.yaxis.axis_label_text_font_size = f"{fontsize}pt"
 
     if kind.upper() == "TPR":
         calculate_true_positive_fractions = np.frompyfunc(
-            lambda p: np.count_nonzero(labels[risks >= p]) / num_positive, 1, 1
-        )
+            lambda p: np.count_nonzero(labels[risks >= p]) / num_positive, 1,
+            1)
         true_positive_fractions = calculate_true_positive_fractions(points)
 
         fig_bottom.y_range = fig_top.y_range
@@ -188,22 +192,20 @@ def plot_predictiveness_curve(
         if np.any(n == 0):
             warning_message = (
                 "The plot of EF at the threshold value where the product with "
-                "the sample data is less than 1 is not displayed."
-            )
+                "the sample data is less than 1 is not displayed.")
             warnings.warn(warning_message)
             thresholds = thresholds[n != 0]
-        enrichment_factors = calculate_enrichment_factor(
-            risks, labels, threshold=thresholds
-        )
+        enrichment_factors = calculate_enrichment_factor(risks,
+                                                         labels,
+                                                         threshold=thresholds)
 
         fig_bottom.line(thresholds, enrichment_factors, **kwargs)
 
     return show(column(fig_top, fig_bottom))
 
 
-def calculate_enrichment_factor(
-    scores, labels, classes=[
-        0, 1], threshold=0.01):
+def calculate_enrichment_factor(scores, labels, classes=[0, 1],
+                                threshold=0.01):
     """
     Calculate enrichment factor. Returns one as the value of enrichment factor
     when the product of sample data and threshold is less than one.
@@ -234,7 +236,6 @@ def calculate_enrichment_factor(
         Return enrichment factors. If threshold is int or float, return one
         value. If threshold is array_like, return ndarray.
     """
-
     def f(threshold):
         n = int(np.floor(scores.size * threshold))
         if n == 0:
@@ -246,19 +247,14 @@ def calculate_enrichment_factor(
     threshold = np.array(threshold)
 
     if np.any(threshold <= 0) | np.any(threshold > 100):
-        raise ValueError(
-            "Invalid value for threshold. Threshold should be "
-            "either positive and smaller a int or ints than 100 "
-            "or a float in the (0, 1) range"
-        )
-    elif threshold.dtype.kind == "f" and (
-        np.any(threshold <= 0) or np.any(threshold > 1)
-    ):
-        raise ValueError(
-            "Invalid value for threshold. Threshold should be "
-            "either positive and a float or floats in the (0, 1) "
-            "range"
-        )
+        raise ValueError("Invalid value for threshold. Threshold should be "
+                         "either positive and smaller a int or ints than 100 "
+                         "or a float in the (0, 1) range")
+    elif threshold.dtype.kind == "f" and (np.any(threshold <= 0)
+                                          or np.any(threshold > 1)):
+        raise ValueError("Invalid value for threshold. Threshold should be "
+                         "either positive and a float or floats in the (0, 1) "
+                         "range")
     elif threshold.dtype.kind == "i":
         threshold = threshold.astype("float32") / 100
 
@@ -284,8 +280,7 @@ def calculate_enrichment_factor(
     if np.any(np.isnan(enrichment_factors)):
         warning_message = (
             "Returns one as the value of enrichment factor because "
-            "the product of sample data and threshold is less than one"
-        )
+            "the product of sample data and threshold is less than one")
         warnings.warn(warning_message)
         enrichment_factors[np.isnan(enrichment_factors)] = 1.0
     if return_float:
