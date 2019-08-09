@@ -71,7 +71,7 @@ def plot_predictiveness_curve(
         the finer the detail.
 
     figsize : tuple, default (400, 340)
-        Width, height in inches. If not provided, defaults to = (4.5, 10).
+        Width, height in pixel. If not provided, defaults to = (400, 340).
 
     fontsize : int, default 12
         Font size for labels in plots.
@@ -98,9 +98,7 @@ def plot_predictiveness_curve(
 
     Returns
     -------
-    figure : matplotlib.figure.Figure
-        A figure instance is returned. You can also assign this figure instant
-        attribute and customize it yourself.
+    show : bokeh.plotting.show
     """
     risks = np.array(risks)
     labels = np.array(labels)
