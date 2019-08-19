@@ -11,11 +11,36 @@ __all__ = [
 ]
 
 
-def _normalize(arr):
+def _normalize(arr: np.ndarray) -> np.ndarray:
+    """
+    Normalize numpy.ndarray data with minimum element to zero and maximum
+    element to one.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+
+    Returns
+    -------
+    normalized_array : numpy.ndarray
+    """
     return (arr - arr.min()) / (arr.max() - arr.min())
 
 
-def _set_axes(ax, lim, fontsize: int):
+def _set_axes(ax, lim: Sequence, fontsize: int):
+    """
+    Wrapper function for setting xlim, grid, label fontsize for axes.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axes object that you want to change configuration
+
+    lim : array_like
+        List for xlimit
+
+    fontsize : int
+    """
     ax.set_xlim(left=lim[0], right=lim[1])
     ax.grid(True)
     ax.xaxis.label.set_fontsize(fontsize)
