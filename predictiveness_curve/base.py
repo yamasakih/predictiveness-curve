@@ -11,11 +11,36 @@ __all__ = [
 ]
 
 
-def _normalize(arr):
+def _normalize(arr: np.ndarray) -> np.ndarray:
+    """
+    Normalize numpy.ndarray data with minimum element to zero and maximum
+    element to one.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+
+    Returns
+    -------
+    normalized_array : numpy.ndarray
+    """
     return (arr - arr.min()) / (arr.max() - arr.min())
 
 
-def _set_axes(ax, lim, fontsize: int):
+def _set_axes(ax, lim: Sequence, fontsize: int):
+    """
+    Wrapper function for setting xlim, grid, label fontsize for axes.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axes object that you want to change configuration
+
+    lim : array_like
+        List for xlimit
+
+    fontsize : int
+    """
     ax.set_xlim(left=lim[0], right=lim[1])
     ax.grid(True)
     ax.xaxis.label.set_fontsize(fontsize)
@@ -103,7 +128,7 @@ def plot_predictiveness_curve(risks,
     thresholds = np.linspace(0, 1, points + 1)[1:]
     points = np.linspace(0, 1, points + 1)
 
-    if not np.all(np.unique(labels) == np.unique(classes)):
+    if not np.array_equal(np.unique(labels), np.unique(classes)):
         raise ValueError('The values of labels and classes do not match')
 
     default_classes = [0, 1]  # Sequence
@@ -243,7 +268,7 @@ def calculate_enrichment_factor(scores, labels, classes=[0, 1],
     elif threshold.dtype.kind == 'i':
         threshold = threshold.astype('float32') / 100
 
-    if not np.all(np.unique(labels) == np.unique(classes)):
+    if not np.array_equal(np.unique(labels), np.unique(classes)):
         raise ValueError('The values of labels and classes do not match')
 
     default_classes: Sequence = [0, 1]
@@ -291,7 +316,7 @@ def convert_label_to_zero_or_one(labels, classes):
     converted label : ndarray, shape = [n_samples]
         Return ndarray which converted labels to 0 and 1.
     """
-    if not np.all(np.unique(labels) == np.unique(classes)):
+    if not np.array_equal(np.unique(labels), np.unique(classes)):
         raise ValueError('The values of labels and classes do not match')
     labels = np.asarray(labels)
     return (labels == classes[1]).astype('int16')
