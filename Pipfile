@@ -16,7 +16,7 @@ scikit-learn = "*"
 
 [packages]
 numpy = "*"
-matplotlib = "*"
+bokeh = "*"
 predictiveness-curve = {editable = true,path = "."}
 
 [requires]

@@ -110,4 +110,6 @@ venv.bak/
 /.venv
 
 notebooks/example.py
+notebooks/bokeh_example.py
+
 docs/source/apis/*.rst
